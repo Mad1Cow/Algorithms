@@ -4,7 +4,7 @@ Compares all instances of the array to the target value
 Sam Moore v1.0
  */
 
-package searchalgorithms.searchalgorithmtester;
+package SearchAlgorithms;
 
 public class LinearSearch
 {
