@@ -1,0 +1,116 @@
+/*
+Tester Class for search algorithms using JavaFX GUI
+Generates a random array for testing search algorithms
+Sam Moore V1.2
+ */
+
+package searchalgorithms.searchalgorithmtester;
+
+import javafx.application.Application;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.stage.Stage;
+
+import java.util.Arrays;
+import java.util.Random;
+
+public class SearchAlgorithmTester extends Application
+{
+    //Store randomly generated array
+    int[] r_arr;
+    LinearSearch linearSearch;
+
+    @Override
+    public void start(Stage stage)
+    {
+        //Non-editable text area to display array
+        TextArea display = new TextArea();
+        display.setEditable(false);
+        display.setMinSize(210, 50);
+        display.setMaxSize(210, 50);
+
+        //Button to generate array
+        Button generateButton = new Button();
+        generateButton.setText("Generate Array");
+        generateButton.setOnAction( e ->
+                {
+                    //Store random array
+                    r_arr = generateArray();
+
+                    //Set display to randomly generated array
+                    display.setText(Arrays.toString(r_arr));
+                });
+
+        //Text field to set target
+        TextField targetField = new TextField();
+        targetField.setMaxWidth(50);
+
+        //Label to display search result
+        Label resultLabel = new Label();
+        resultLabel.setTextFill(Color.RED);
+        resultLabel.setFont(Font.font("Arial", 20));
+
+        //Button to search array
+        Button searchButton = new Button();
+        searchButton.setText("Search");
+        searchButton.setOnAction( e ->
+                {
+                    if(targetField.getText().isEmpty())
+                    {
+                        resultLabel.setText("Please enter a value");
+                    }else{
+                        //Call to search class
+                        linearSearch = new LinearSearch(r_arr, Integer.parseInt(targetField.getText()));
+
+                        if(linearSearch.searchArray() < 0)
+                        {
+                            resultLabel.setText("Target not in array");
+                        }else{
+                            resultLabel.setText("Target is at location " + (linearSearch.searchArray() + 1));
+                        }
+                    }
+                });
+
+        HBox searchGroup = new HBox(10);
+        searchGroup.setAlignment(Pos.CENTER);
+        searchGroup.getChildren().addAll(targetField, searchButton);
+
+        VBox root = new VBox(25);
+        root.setAlignment(Pos.CENTER);
+        root.getChildren().addAll(generateButton, display, searchGroup, resultLabel);
+
+        Scene scene = new Scene(root, 350, 250);
+        stage.setScene(scene);
+        stage.setTitle("Search Algorithm Tester");
+        stage.show();
+    }
+
+    public static void main(String[] args)
+    {
+        launch(args);
+    }
+
+    //Method for generating a random array of ints
+    static int[] generateArray()
+    {
+        int min = 0;
+        int max = 100;
+
+        Random r = new Random();
+        int[] arr = new int[10];
+        for (int i = 0; i < arr.length; i++)
+        {
+            arr[i] = r.nextInt(max + 1 - min) + min;
+        }
+
+        return arr;
+    }
+}
