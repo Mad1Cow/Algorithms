@@ -1,22 +1,20 @@
 /*
 Tester Class for search algorithms using JavaFX GUI
 Generates a random array for testing search algorithms
-Sam Moore V1.2
+Sam Moore V1.3
  */
 
-package SearchAlgorithms;
+package searchalgorithms;
 
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.util.Arrays;
@@ -26,7 +24,13 @@ public class SearchAlgorithmTester extends Application
 {
     //Store randomly generated array
     int[] r_arr;
+
+    //Boolean to check if array is sorted
+    boolean isSorted = false;
+
+    //Reference to search algorithm objects
     LinearSearch linearSearch;
+    BinarySearch binarySearch;
 
     @Override
     public void start(Stage stage)
@@ -37,6 +41,27 @@ public class SearchAlgorithmTester extends Application
         display.setMinSize(210, 50);
         display.setMaxSize(210, 50);
 
+        //Text field to set target to search
+        TextField targetField = new TextField();
+        targetField.setMaxWidth(50);
+
+        //Label to display search result
+        Label resultLabel = new Label();
+        resultLabel.setWrapText(true);
+        resultLabel.setTextFill(Color.RED);
+        resultLabel.setTextAlignment(TextAlignment.CENTER);
+        resultLabel.setFont(Font.font("Arial", 16));
+
+        //Radio button to select search algorithm
+        ToggleGroup group = new ToggleGroup();
+
+        RadioButton linearRB = new RadioButton("Linear");
+        linearRB.setToggleGroup(group);
+        linearRB.setSelected(true);
+
+        RadioButton binaryRB = new RadioButton("Binary");
+        binaryRB.setToggleGroup(group);
+
         //Button to generate array
         Button generateButton = new Button();
         generateButton.setText("Generate Array");
@@ -45,20 +70,32 @@ public class SearchAlgorithmTester extends Application
                     //Store random array
                     r_arr = generateArray();
 
+                    //Set array as unsorted
+                    isSorted = false;
+
                     //Set display to randomly generated array
                     display.setText(Arrays.toString(r_arr));
                 });
 
-        //Text field to set target
-        TextField targetField = new TextField();
-        targetField.setMaxWidth(50);
+        //Button to sort array (necessary for binary search)
+        Button sortButton = new Button();
+        sortButton.setText("Sort Array");
+        sortButton.setOnAction( e ->
+                {
+                    if(display.getText().isEmpty())
+                    {
+                        display.setText("Please generate an array to sort");
+                    }else{
+                        sortArray(r_arr);
 
-        //Label to display search result
-        Label resultLabel = new Label();
-        resultLabel.setTextFill(Color.RED);
-        resultLabel.setFont(Font.font("Arial", 20));
+                        //Set array as sorted
+                        isSorted = true;
 
-        //Button to search array
+                        display.setText(Arrays.toString(r_arr));
+                    }
+                });
+
+        //Button to search array for target
         Button searchButton = new Button();
         searchButton.setText("Search");
         searchButton.setOnAction( e ->
@@ -67,17 +104,41 @@ public class SearchAlgorithmTester extends Application
                     {
                         resultLabel.setText("Please enter a value");
                     }else{
-                        //Call to search class
-                        linearSearch = new LinearSearch(r_arr, Integer.parseInt(targetField.getText()));
-
-                        if(linearSearch.searchArray() < 0)
+                        if(linearRB.isSelected() == true)
                         {
-                            resultLabel.setText("Target not in array");
-                        }else{
-                            resultLabel.setText("Target is at location " + (linearSearch.searchArray() + 1));
+                            //Call to search class
+                            linearSearch = new LinearSearch(r_arr, Integer.parseInt(targetField.getText()));
+
+                            if(linearSearch.searchArray() < 0)
+                            {
+                                resultLabel.setText("Target not in array");
+                            }else{
+                                resultLabel.setText("Target is at location " + (linearSearch.searchArray() + 1));
+                            }
+                        }else if(binaryRB.isSelected() == true)
+                        {
+                            //Check if array is sorted
+                            if(isSorted == false)
+                            {
+                                resultLabel.setText("Array needs to be sorted for binary search");
+                            }else{
+                                //Call to search class
+                                binarySearch = new BinarySearch(r_arr, Integer.parseInt(targetField.getText()));
+
+                                if(binarySearch.searchArray() < 0)
+                                {
+                                    resultLabel.setText("Target not in array");
+                                }else{
+                                    resultLabel.setText("Target is at location " + (binarySearch.searchArray() + 1));
+                                }
+                            }
                         }
                     }
                 });
+
+        HBox rbGroup = new HBox(10);
+        rbGroup.setAlignment(Pos.CENTER);
+        rbGroup.getChildren().addAll(linearRB, binaryRB);
 
         HBox searchGroup = new HBox(10);
         searchGroup.setAlignment(Pos.CENTER);
@@ -85,9 +146,9 @@ public class SearchAlgorithmTester extends Application
 
         VBox root = new VBox(25);
         root.setAlignment(Pos.CENTER);
-        root.getChildren().addAll(generateButton, display, searchGroup, resultLabel);
+        root.getChildren().addAll(generateButton, display, sortButton, rbGroup, searchGroup, resultLabel);
 
-        Scene scene = new Scene(root, 350, 250);
+        Scene scene = new Scene(root, 350, 350);
         stage.setScene(scene);
         stage.setTitle("Search Algorithm Tester");
         stage.show();
@@ -112,5 +173,23 @@ public class SearchAlgorithmTester extends Application
         }
 
         return arr;
+    }
+
+    //Method for sorting array (necessary for binary search)
+    //Uses Insertion Sort
+    static void sortArray(int[] arrIn)
+    {
+        for(int i = 1; i < arrIn.length; i++)
+        {
+            int key = arrIn[i];
+            int j = i - 1;
+
+            while(j >= 0 && arrIn[j] > key)
+            {
+                arrIn[j + 1] = arrIn[j];
+                j = j - 1;
+            }
+            arrIn[j + 1] = key;
+        }
     }
 }
