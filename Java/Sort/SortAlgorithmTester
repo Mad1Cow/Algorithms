@@ -1,0 +1,95 @@
+/*
+Tester Class for sort algorithms using JavaFX GUI
+Generates a random array for testing sort algorithms
+Sam Moore V1.0
+ */
+
+package SortAlgorithms;
+
+import javafx.application.Application;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+import java.util.Arrays;
+import java.util.Random;
+
+public class SortAlgorithmTester extends Application
+{
+    //Store randomly generated array
+    int[] r_arr;
+
+    //Reference to sort algorithm objects
+    InsertionSort insertionSort;
+
+    @Override
+    public void start(Stage stage)
+    {
+        //Non-editable text area to display array
+        TextArea display = new TextArea();
+        display.setEditable(false);
+        display.setMinSize(210, 50);
+        display.setMaxSize(210, 50);
+
+        //Button to generate array
+        Button generateButton = new Button();
+        generateButton.setText("Generate Array");
+        generateButton.setOnAction( e ->
+        {
+            //Store random array
+            r_arr = generateArray();
+
+            //Set display to randomly generated array
+            display.setText(Arrays.toString(r_arr));
+        });
+
+        //Button to sort array (necessary for binary search)
+        Button sortButton = new Button();
+        sortButton.setText("Sort Array");
+        sortButton.setOnAction( e ->
+        {
+            if(display.getText().isEmpty())
+            {
+                display.setText("Please generate an array to sort");
+            }else{
+                //Call to sort class
+                insertionSort = new InsertionSort(r_arr);
+
+                display.setText(Arrays.toString(insertionSort.sortArray()));
+            }
+        });
+
+        VBox root = new VBox(25);
+        root.setAlignment(Pos.CENTER);
+        root.getChildren().addAll(generateButton, display, sortButton);
+
+        Scene scene = new Scene(root, 350, 350);
+        stage.setScene(scene);
+        stage.setTitle("Search Algorithm Tester");
+        stage.show();
+    }
+
+    public static void main(String[] args)
+    {
+        launch();
+    }
+
+    //Method for generating a random array of ints
+    static int[] generateArray()
+    {
+        int min = 0;
+        int max = 100;
+
+        Random r = new Random();
+        int[] arr = new int[10];
+        for (int i = 0; i < arr.length; i++)
+        {
+            arr[i] = r.nextInt(max + 1 - min) + min;
+        }
+
+        return arr;
+    }
+}
